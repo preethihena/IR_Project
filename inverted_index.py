@@ -7,7 +7,6 @@ import phonetics
 # List Of English Stop Words
 # http://armandbrahaj.blog.al/2009/04/14/list-of-english-stop-words/
 _WORD_MIN_LENGTH = 3
-inverted = {}
 _STOP_WORDS = frozenset([
 'a', 'about', 'above', 'above', 'across', 'after', 'afterwards', 'again', 
 'against', 'all', 'almost', 'alone', 'along', 'already', 'also','although',
@@ -119,10 +118,6 @@ def inverted_index(text):
 
     return inverted
 
-def get_inverted_index():
-    for word, doc_locations in inverted.items():
-        print (word, doc_locations)
-    return inverted
 
 
 def inverted_index_add(inverted, doc_id, doc_index):
@@ -147,17 +142,17 @@ def search(inverted, query):
     return functools.reduce(lambda x, y: x & y, results) if results else []
 
 if __name__ == '__main__':
+    inverted = {}
     # Build Inverted-Index for documents
     doc_id=1
     for filename in os.listdir("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles"):
-        if filename.endswith(".txt"):
-    #for doc_id, text in documents.items():
+        if filename.endswith(".txt") and doc_id <=2:
             filename= os.path.join("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles", filename)
             file1 = open(filename,"r")
             text=file1.read()
             doc_index = inverted_index(text)
             inverted_index_add(inverted, doc_id, doc_index)
-            doc_id += 1
+            doc_id = doc_id + 1
 
     # Print Inverted-Index
     #print (type(inverted))
@@ -168,6 +163,8 @@ if __name__ == '__main__':
 
     # close the file
     file.close()
+
+    #print type(inverted)
 
     for word, doc_locations in inverted.items():
         print word, doc_locations
