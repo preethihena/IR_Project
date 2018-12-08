@@ -1,0 +1,4 @@
+nltk==3.4
+phonetics==1.0.5
+singledispatch==3.4.0.3
+six==1.11.0

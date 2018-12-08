@@ -3,10 +3,13 @@ import functools
 import unicodedata,pickle
 import os
 import phonetics
+from nltk.stem import PorterStemmer
+from nltk.stem import LancasterStemmer
 
 # List Of English Stop Words
 # http://armandbrahaj.blog.al/2009/04/14/list-of-english-stop-words/
 _WORD_MIN_LENGTH = 3
+
 _STOP_WORDS = frozenset([
 'a', 'about', 'above', 'above', 'across', 'after', 'afterwards', 'again', 
 'against', 'all', 'almost', 'alone', 'along', 'already', 'also','although',
@@ -48,6 +51,10 @@ _STOP_WORDS = frozenset([
 'yourselves', 'the'])
 
 
+#Directory of this file
+BASE_DIR  = os.path.dirname(os.path.realpath(__file__))
+# Location of the files to be indexed
+FILE_ROOT = os.path.join(BASE_DIR, 'inputFiles')
 
 def word_split(text):
     """
@@ -127,7 +134,12 @@ def inverted_index_add(inverted, doc_id, doc_index):
     using doc_id as document identifier.
         {word:(hash,{doc_id:[locations]})}
     """
+
+    # porter = PorterStemmer()
+    # lancaster=LancasterStemmer()
     for word, locations in doc_index.items():
+    	# word = porter.stem(word)
+    	# word = lancaster.stem(word)
         phonetic_hash = phonetics.dmetaphone(word)
         indices = inverted.setdefault(word, (phonetic_hash,{}))
         indices[1][doc_id] = locations
@@ -143,42 +155,24 @@ def search(inverted, query):
 
 if __name__ == '__main__':
     inverted = {}
+    doc_id = 1
     # Build Inverted-Index for documents
-    doc_id=1
-    for filename in os.listdir("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles"):
+    for filename in os.listdir(FILE_ROOT):
         if filename.endswith(".txt") and doc_id <=2:
-            filename= os.path.join("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles", filename)
+            filename= os.path.join(FILE_ROOT, filename)
             file1 = open(filename,"r")
             text=file1.read()
             doc_index = inverted_index(text)
             inverted_index_add(inverted, doc_id, doc_index)
-            doc_id = doc_id + 1
+            doc_id += 1
 
-    # Print Inverted-Index
-    #print (type(inverted))
+    #open file to store the index
     file = open('indexed', 'wb')
-
     # dump information to that file
     pickle.dump(inverted, file)
 
     # close the file
     file.close()
 
-    #print type(inverted)
-
-    for word, doc_locations in inverted.items():
-        print word, doc_locations
-
-    # Search something and print results
-    # queries = ['Week', 'Niners week', 'West-coast Week']
-    # for query in queries:
-    #     result_docs = search(inverted, query)
-    #     print ("Search for '%s': %r" % (query, result_docs))
-    #     for _, word in word_index(query):
-    #         def extract_text(doc, index): 
-    #             return documents[doc][index:index+20].replace('\n', ' ')
-
-    #         for doc in result_docs:
-    #             for index in inverted[word][doc]:
-    #                 print ('   - %s...' % extract_text(doc, index))
-    #     print()
+    # for word, doc_locations in inverted.items():
+    #     print (word, doc_locations)

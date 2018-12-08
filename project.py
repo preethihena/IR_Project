@@ -3,19 +3,19 @@ import operator
 import pickle
 from collections import OrderedDict
 
-# open a file, where you stored the pickled data
+# open a file, where inverted index is stored
 file = open('indexed', 'rb')
 
-# dump information to that file
+# get the informationh from file
 inverted_index = pickle.load(file)
 
 # close the file
 file.close()
-retrieved_docs_list=[]
-def get_levenshtein_distance(word1, word2):
 
-    print type(word1)
-    print type(word2)
+retrieved_docs_list=[]
+
+
+def get_levenshtein_distance(word1, word2):
     word2 = word2.lower()
     word1 = word1.lower()
     matrix = [[0 for x in range(len(word2) + 1)] for x in range(len(word1) + 1)]
@@ -83,7 +83,7 @@ def retrieve_docs(word):
 
 
 final=OrderedDict()
-query=raw_input('Enter query:').split(' ')
+query=raw_input('Enter query:\n').split(' ')
 positions=[]
 flag=0
 for word in query:
@@ -110,7 +110,7 @@ for word in query:
             
 print final
 if flag==1:
-    print  "Your suggested query is:" 
+    print "Your suggested query is:" 
     print form_final_query(final)
 
 print retrieved_docs_list
