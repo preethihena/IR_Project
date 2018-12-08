@@ -1,5 +1,5 @@
 # DocTrees
-Phone Code to Implement Phonetic and levenshtein distance for text correction as part of our project in 5th semester engineering in Indian Institute of Information Technology, SriCity. 
+Python Code to Implement Phonetic and levenshtein distance for text correction as part of our project in 5th semester engineering in Indian Institute of Information Technology, SriCity. 
 
 
 ## Requirements

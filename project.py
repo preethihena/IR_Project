@@ -2,6 +2,8 @@ import phonetics
 import operator
 import pickle
 from collections import OrderedDict
+from tokenization import * 
+
 
 # open a file, where inverted index is stored
 file = open('indexed', 'rb')
@@ -83,40 +85,42 @@ def retrieve_docs(word):
 
 
 final=OrderedDict()
-query=raw_input('Enter query:\n').split(' ')
+query=input('Enter query:\n')
+# query = [word for _, word in word_index(query)]
+query=query.split()
 positions=[]
 flag=0
 for word in query:
     position=query.index(word)
     positions.append(position)
     name="list_"+str(position)
-    if word in inverted_index:  #need to find inverted index list here
+    if word in inverted_index:  
         final[name]=[(word,-1)]
         retrieve_docs(word)
         continue
     else:
         flag=1
         phonetic_dict=check_phonetic(word)
-        print phonetic_dict
+        # print phonetic_dict
         if(len(phonetic_dict)==0):
             #write some function afterwards
             continue
         else:
-            edit_dict = dict(map(lambda x: (x[0], get_levenshtein_distance(query[position],x[0])), phonetic_dict.iteritems()))
+            edit_dict = dict(map(lambda x: (x[0], get_levenshtein_distance(query[position],x[0])), phonetic_dict.items()))
             edit_list = sorted(edit_dict.items(), key=operator.itemgetter(1))  #returns list of tuples
             final[name]=edit_list
             retrieve_docs(str(final[name][0][0]))
 
             
-print final
+# print final
 if flag==1:
-    print "Your suggested query is:" 
-    print form_final_query(final)
+    print ("Your suggested query is:") 
+    print (form_final_query(final))
 
-print retrieved_docs_list
+print (retrieved_docs_list)
 
 final_doc_set = set.union(*retrieved_docs_list)
-print final_doc_set
+print(final_doc_set)
 
 # for word, doc_locations in inverted.items():
 #     print (word, doc_locations)
