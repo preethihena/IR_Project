@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import functools
-import unicodedata
+import unicodedata,pickle
+import os
+import phonetics
 
 # List Of English Stop Words
 # http://armandbrahaj.blog.al/2009/04/14/list-of-english-stop-words/
 _WORD_MIN_LENGTH = 3
+inverted = {}
 _STOP_WORDS = frozenset([
 'a', 'about', 'above', 'above', 'across', 'after', 'afterwards', 'again', 
 'against', 'all', 'almost', 'alone', 'along', 'already', 'also','although',
@@ -44,6 +47,8 @@ _STOP_WORDS = frozenset([
 'while', 'whither', 'who', 'whoever', 'whole', 'whom', 'whose', 'why', 'will', 
 'with', 'within', 'without', 'would', 'yet', 'you', 'your', 'yours', 'yourself',
 'yourselves', 'the'])
+
+
 
 def word_split(text):
     """
@@ -114,16 +119,23 @@ def inverted_index(text):
 
     return inverted
 
+def get_inverted_index():
+    for word, doc_locations in inverted.items():
+        print (word, doc_locations)
+    return inverted
+
+
 def inverted_index_add(inverted, doc_id, doc_index):
     """
     Add Invertd-Index doc_index of the document doc_id to the 
     Multi-Document Inverted-Index (inverted), 
     using doc_id as document identifier.
-        {word:{doc_id:[locations]}}
+        {word:(hash,{doc_id:[locations]})}
     """
     for word, locations in doc_index.items():
-        indices = inverted.setdefault(word, {})
-        indices[doc_id] = locations
+        phonetic_hash = phonetics.dmetaphone(word)
+        indices = inverted.setdefault(word, (phonetic_hash,{}))
+        indices[1][doc_id] = locations
     return inverted
 
 def search(inverted, query):
@@ -135,50 +147,41 @@ def search(inverted, query):
     return functools.reduce(lambda x, y: x & y, results) if results else []
 
 if __name__ == '__main__':
-    doc1 = """
-Niners head coach Mike Singletary will let Alex Smith remain his starting 
-quarterback, but his vote of confidence is anything but a long-term mandate.
-
-Smith now will work on a week-to-week basis, because Singletary has voided 
-his year-long lease on the job.
-
-"I think from this point on, you have to do what's best for the football team,"
-Singletary said Monday, one day after threatening to bench Smith during a 
-27-24 loss to the visiting Eagles.
-"""
-
-    doc2 = """
-The fifth edition of West Coast Green, a conference focusing on "green" home 
-innovations and products, rolled into San Francisco's Fort Mason last week 
-intent, per usual, on making our living spaces more environmentally friendly 
-- one used-tire house at a time.
-
-To that end, there were presentations on topics such as water efficiency and 
-the burgeoning future of Net Zero-rated buildings that consume no energy and 
-produce no carbon emissions.
-"""
-
     # Build Inverted-Index for documents
-    inverted = {}
-    documents = {'doc1':doc1, 'doc2':doc2}
-    for doc_id, text in documents.items():
-        doc_index = inverted_index(text)
-        inverted_index_add(inverted, doc_id, doc_index)
+    doc_id=1
+    for filename in os.listdir("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles"):
+        if filename.endswith(".txt"):
+    #for doc_id, text in documents.items():
+            filename= os.path.join("F:\STUDIES\ACADEMICS\SEM-5\IR\IR_Project\inputFiles", filename)
+            file1 = open(filename,"r")
+            text=file1.read()
+            doc_index = inverted_index(text)
+            inverted_index_add(inverted, doc_id, doc_index)
+            doc_id += 1
 
     # Print Inverted-Index
+    #print (type(inverted))
+    file = open('indexed', 'wb')
+
+    # dump information to that file
+    pickle.dump(inverted, file)
+
+    # close the file
+    file.close()
+
     for word, doc_locations in inverted.items():
-        print (word, doc_locations)
+        print word, doc_locations
 
     # Search something and print results
-    queries = ['Week', 'Niners week', 'West-coast Week']
-    for query in queries:
-        result_docs = search(inverted, query)
-        print ("Search for '%s': %r" % (query, result_docs))
-        for _, word in word_index(query):
-            def extract_text(doc, index): 
-                return documents[doc][index:index+20].replace('\n', ' ')
+    # queries = ['Week', 'Niners week', 'West-coast Week']
+    # for query in queries:
+    #     result_docs = search(inverted, query)
+    #     print ("Search for '%s': %r" % (query, result_docs))
+    #     for _, word in word_index(query):
+    #         def extract_text(doc, index): 
+    #             return documents[doc][index:index+20].replace('\n', ' ')
 
-            for doc in result_docs:
-                for index in inverted[word][doc]:
-                    print ('   - %s...' % extract_text(doc, index))
-        print()
+    #         for doc in result_docs:
+    #             for index in inverted[word][doc]:
+    #                 print ('   - %s...' % extract_text(doc, index))
+    #     print()

@@ -1,65 +1,49 @@
 import phonetics
 import operator
+import pickle
+
+# open a file, where you stored the pickled data
+file = open('indexed', 'rb')
+
+# dump information to that file
+inverted_index = pickle.load(file)
+
+# close the file
+file.close()
 def get_levenshtein_distance(word1, word2):
-    """
-    https://en.wikipedia.org/wiki/Levenshtein_distance
-    :param word1:
-    :param word2:
-    :return:
-    """
-    word2 = word2.lower()
-    word1 = word1.lower()
-    matrix = [[0 for x in range(len(word2) + 1)] for x in range(len(word1) + 1)]
-
-    for x in range(len(word1) + 1):
-        matrix[x][0] = x
-    for y in range(len(word2) + 1):
-        matrix[0][y] = y
-
-    for x in range(1, len(word1) + 1):
-        for y in range(1, len(word2) + 1):
-            if word1[x - 1] == word2[y - 1]:
-                matrix[x][y] = min(
-                    matrix[x - 1][y] + 1,
-                    matrix[x - 1][y - 1],
-                    matrix[x][y - 1] + 1
-                )
-            else:
-                matrix[x][y] = min(
-                    matrix[x - 1][y] + 1,
-                    matrix[x - 1][y - 1] + 1,
-                    matrix[x][y - 1] + 1
-                )
-
-    return matrix[len(word1)][len(word2)]
 
 def check_phonetic(word):
-	phonetic_dict={}
-	one=phonetics.dmetaphone()
-	for each in inverted_index:
-		two=phonetics.dmetaphone()
-		if one==two:
-			phonetic_dict['each']=0
-	return phonetic_dict
-final=OrderedDict()
-query=input().split()
-positions=[]
-for word in query:
-	position=query.index(word)
-	positions.append(position)
-	a="list_"+str(position)
-	if word in inverted_index:  #need to find inverted index list here
-		final[a]=word
-		continue
-	else:
-		phonetic_dict=check_phonetic(word)
-		if(len(phonetic_dict)==0):
-			#write some function afterwards
-		else:
-			edit_dict = dict(map(lambda x: (x[0], get_levenshtein_distance(query[position],x[1])), phonetic_dict.iteritems()))
-			edit_list = sorted(dict_name.items(), key=operator.itemgetter(1))  #returns list of tuples
-			final[a]=edit_list
-			
+    phonetic_dict={}
+    one=phonetics.dmetaphone(word)
+    for each in inverted_index:
+        two = inverted_index[each][0]
+        if (one[0] in two and len(one[0])>0) or (one[1] in two and len(one[1])>0):
+            phonetic_dict[each]=-1
+    return phonetic_dict
 
 
-	
+# final=OrderedDict()
+# query=input().split()
+# positions=[]
+# for word in query:
+#     position=query.index(word)
+#     positions.append(position)
+#     name="list_"+str(position)
+#     if word in inverted:  #need to find inverted index list here
+#         final[name]=word
+#         continue
+#     else:
+#         phonetic_dict=check_phonetic(word)
+#         if(len(phonetic_dict)==0):
+#             #write some function afterwards
+#         else:
+#             edit_dict = dict(map(lambda x: (x[0], get_levenshtein_distance(query[position],x[1])), phonetic_dict.iteritems()))
+#             edit_list = sorted(dict_name.items(), key=operator.itemgetter(1))  #returns list of tuples
+#             final[name]=edit_list
+            
+
+for word, doc_locations in inverted.items():
+    print (word, doc_locations)
+
+
+    
