@@ -78,7 +78,7 @@ def word_split(text):
 
 def words_cleanup(words):
     """
-    Remove words with length less then a minimum and stopwords.
+    Remove words with length less than a minimum and stopwords.
     """
     cleaned_words = []
     for index, word in words:
