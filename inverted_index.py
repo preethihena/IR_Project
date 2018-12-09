@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 doc_ids_names[doc_id]=filename
                 file_location = os.path.join(FILE_ROOT, filename)
                 doc_file = open(file_location,"r")
-                print(filename)
+                # print(filename)
                 text = doc_file.read()
                 doc_index = inverted_index(text)
                 inverted_index_add(inverted, doc_id, doc_index)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         file1 = open('Documents_info','wb')
         pickle.dump(doc_ids_names, file1)
         file1.close()
-        print("Files Indexed.")
+        print("{} files Indexed by {} algorithm.".format(doc_id,phonetic_type))
     else:
         print("You entered wrong input")
 
